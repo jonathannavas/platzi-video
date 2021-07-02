@@ -1,30 +1,31 @@
 import React, { useEffect, useState } from 'react';
+import { connect } from 'react-redux';
+
 import '../assets/styles/App.scss';
-import Header from '../components/Header';
 import Search from '../components/Search';
 import Categories from '../components/Categories';
 import Carousel from '../components/Carousel';
 import CarouselItem from '../components/CarouselItem';
-import Footer from '../components/Footer';
 
-import useInitialState from '../hooks/useInitialState';
-const API = 'http://localhost:3000/initalState';
+import Header from '../components/Header';
 
-const Home = () => {
-
-
-    const initialState = useInitialState(API)
+const Home = ({ mylist, trends, originals }) => {
 
     return(
-        <div className="App">
+        <>
             <Header />
-            <Search />
+            <Search isHome />
 
             {
-                initialState.mylist.length > 0 && (
+                mylist.length > 0 && (
                     <Categories title='Mi Lista'>
                         <Carousel>
-                            <CarouselItem />
+                            {
+                                mylist.map( (item,id)=>{
+                                    return <CarouselItem key={id} {...item} isList/>
+                                })
+
+                            }
                         </Carousel>
                     </Categories>
                 )
@@ -33,7 +34,7 @@ const Home = () => {
             <Categories title='Tendencias'>
                 <Carousel>
                     {
-                        initialState.trends.map( item => {
+                        trends.map( item => {
                            return <CarouselItem  key={item.id} {...item} />
                         })
                     }
@@ -43,17 +44,23 @@ const Home = () => {
             <Categories title='Originales de Platzi Video'>
                 <Carousel>
                     {
-                        initialState.originals.map( item => {
+                        originals.map( item => {
                             return <CarouselItem  key={item.id} {...item} />
-                         })
+                        })
                     }
                 </Carousel>
             </Categories>
 
-            <Footer />
-        </div>
+        </>
     );
-}
+};
 
+const mapStateToProps = state => {
+    return{
+        mylist: state.mylist,
+        trends: state.trends,
+        originals: state.originals,
+    };
+};
 
-export default Home;
+export default connect(mapStateToProps, null)(Home);
